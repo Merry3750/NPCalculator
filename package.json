@@ -1,25 +1,25 @@
 {
-  "name": "npcalculator",
-  "version": "1.0.0",
-  "description": "",
-  "main": "main.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node main.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/ACMerriman/NPCalculator.git"
-  },
-  "author": "Andrew Merriman",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/ACMerriman/NPCalculator/issues"
-  },
-  "homepage": "https://github.com/ACMerriman/NPCalculator#readme",
-  "dependencies": {
-    "express": "^4.17.1",
-    "leaflet": "^1.6.0",
-    "open": "^7.0.0"
-  }
+	"name": "npcalculator",
+	"version": "1.0.0",
+	"description": "",
+	"main": "main.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"start": "node main.js"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/ACMerriman/NPCalculator.git"
+	},
+	"author": "Andrew Merriman",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/ACMerriman/NPCalculator/issues"
+	},
+	"homepage": "https://github.com/ACMerriman/NPCalculator#readme",
+	"dependencies": {
+		"express": "^4.17.1",
+		"leaflet": "^1.6.0",
+		"open": "^7.0.0"
+	}
 }

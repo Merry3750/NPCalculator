@@ -1,4 +1,22 @@
-
 #map{
 	height:100%;
+}
+
+#addressContainer{
+	width:100%;
+	padding-bottom:4px;
+}
+
+#addressInput{
+	width:80%;
+}
+
+.error .leaflet-popup-tip {
+	width: 0px;
+	height: 0px;
+}
+
+.error .leaflet-popup-content-wrapper{
+	background-color:#FCC;
+	font-weight:bold;
 }
