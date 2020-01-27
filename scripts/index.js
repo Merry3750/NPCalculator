@@ -29,7 +29,6 @@ window.onload = function()
 		{
 			if(response && response.features && response.features[0])
 			{
-				console.log(response.features[0]);
 				target = response.features[0]
 
 				//clear markers and add a new one on the searched location
@@ -129,7 +128,9 @@ window.onload = function()
 function doCalculations(layer)
 {
 	var area = L.GeometryUtil.geodesicArea(layer.getLatLngs()[0]).toFixed(2);
-	var efficiency = 0.20; //assuming 20% yield
+	//I'm choosing to assume a 20% yield because that seems to be on the upper end of
+	//what modern day solar panels are able to achieve.
+	var efficiency = 0.20;
 	var peakPower = (area * efficiency).toFixed(2);
 
 	popupText = "";
@@ -137,7 +138,6 @@ function doCalculations(layer)
 	popupText += "Nominal Power: " + peakPower + "kWp<br />";
 
 	var tilt = parseFloat(document.getElementById("tiltInput").value);
-	console.log(typeof tilt)
 	if(tilt && tilt > 0)
 	{
 		var tiltRadians = tilt * Math.PI / 180.0;
