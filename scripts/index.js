@@ -109,16 +109,20 @@ window.onload = function()
 
 		drawnItems.addLayer(layer);
 		doCalculations(layer);
-	});
+		layer.openPopup();
+	});	
 
-	//when the user edits a polygon, update the calculations
-	map.on('draw:edited', function(e) 
+	var updateCalculations = function()
 	{
-		var layers = e.layers;
-		layers.eachLayer(function (layer) {
+		drawnItems.eachLayer(function (layer) {
 			doCalculations(layer);
 		});
-	});
+	};
+
+	//when the user edits a polygon, update the calculations
+	map.on('draw:edited', updateCalculations);
+	document.getElementById("tiltInput").onchange = updateCalculations;
+
 }
 
 //calculating nominal power
@@ -126,13 +130,24 @@ function doCalculations(layer)
 {
 	var area = L.GeometryUtil.geodesicArea(layer.getLatLngs()[0]).toFixed(2);
 	var efficiency = 0.20; //assuming 20% yield
-	var peak_power = (area * efficiency).toFixed(2);
+	var peakPower = (area * efficiency).toFixed(2);
 
-	//I'm not sure if this is how you calculate nominal power, it seems a little to simple. I'll double check with Nicolas.
 	popupText = "";
 	popupText += "Area: " + area + "m<sup>2</sup><br />";
-	popupText += "Nominal Power: " + peak_power + "kWp<br />";
+	popupText += "Nominal Power: " + peakPower + "kWp<br />";
 
-	layer.bindPopup(popupText).openPopup();
+	var tilt = parseFloat(document.getElementById("tiltInput").value);
+	console.log(typeof tilt)
+	if(tilt && tilt > 0)
+	{
+		var tiltRadians = tilt * Math.PI / 180.0;
+		var tiltArea = (area * Math.cos(tiltRadians)).toFixed(2);
+		var tiltPeakPower = (tiltArea * efficiency).toFixed(2);
+
+		popupText += "Projected Area: " + tiltArea + "m<sup>2</sup><br />";
+		popupText += "Porjected Nominal Power: " + tiltPeakPower + "kWp<br />";
+	}
+
+	layer.bindPopup(popupText);
 }
 
