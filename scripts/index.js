@@ -3,10 +3,10 @@ window.onload = function()
 	var map = L.map("map").setView([39.50, -98.35], 5);
 
 	L.tileLayer("https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}", {
-	attribution: "Map data &copy; <a href='https://www.openstreetmap.org/'>OpenStreetMap</a> contributors, <a href='https://creativecommons.org/licenses/by-sa/2.0/'>CC-BY-SA</a>, Imagery © <a href='https://www.mapbox.com/'>Mapbox</a>",
-	maxZoom: 18,
-	id: "mapbox/streets-v11",
-	accessToken: "pk.eyJ1IjoiYWNtZXJyaW1hbiIsImEiOiJjazV2ZXUwb3oxM2c0M25yenJqdnVvdnBnIn0.ra4GCwZ-B5ou6_ha5ETnLg"
+		attribution: "Map data &copy; <a href='https://www.openstreetmap.org/'>OpenStreetMap</a> contributors, <a href='https://creativecommons.org/licenses/by-sa/2.0/'>CC-BY-SA</a>, Imagery © <a href='https://www.mapbox.com/'>Mapbox</a>",
+		maxZoom: 18,
+		id: "mapbox/streets-v11",
+		accessToken: "pk.eyJ1IjoiYWNtZXJyaW1hbiIsImEiOiJjazV2ZXUwb3oxM2c0M25yenJqdnVvdnBnIn0.ra4GCwZ-B5ou6_ha5ETnLg"
 	}).addTo(map);
 
 	var markers = L.layerGroup().addTo(map);
@@ -25,7 +25,8 @@ window.onload = function()
 		//serch location using mapbox API
 		fetch("https://api.mapbox.com/geocoding/v5/mapbox.places/" + encodeURI(address) + ".json?access_token=pk.eyJ1IjoiYWNtZXJyaW1hbiIsImEiOiJjazV2ZXUwb3oxM2c0M25yenJqdnVvdnBnIn0.ra4GCwZ-B5ou6_ha5ETnLg")
 		.then(function(data){return data.json();})
-		.then(function(response){
+		.then(function(response)
+		{
 			if(response && response.features && response.features[0])
 			{
 				console.log(response.features[0]);
@@ -51,20 +52,87 @@ window.onload = function()
 			//display error if search yields no results
 			else
 			{
-				console.log(map.getCenter())
-				L.popup({"className":"error"}).setLatLng(map.getCenter()).setContent("Unable to find " + address).openOn(map);
+				L.popup({className:"error"}).setLatLng(map.getCenter()).setContent("Unable to find " + address).openOn(map);
 			}
 		});
 	};
 
 	//call the on click for the submit button when the user hits enter
-	document.getElementById('addressInput').onkeypress = function(e)
+	document.getElementById("addressInput").onkeypress = function(e)
 	{
 		if (!e) e = window.event;
 		var keyCode = e.keyCode || e.which;
-		if (keyCode == '13'){
+		if (keyCode == "13"){
 			document.getElementById("addressSubmit").onclick();
 		}
 	}
+
+	var drawnItems = new L.FeatureGroup();
+	map.addLayer(drawnItems);
+
+	var drawPluginOptions = {
+		position: "topleft",
+		draw: 
+		{
+			polygon: 
+			{
+				allowIntersection: false,
+				drawError: 
+				{
+					color: "#F00", // Color the shape will turn when intersects
+					message: "Please do not draw intersecting shapes"
+				},
+				shapeOptions: 
+				{
+					color: "#0F0"
+				}
+			},
+			// disable toolbar item by setting it to false
+			polyline: false,
+			circle: false,
+			rectangle: false,
+			marker: false,
+		},
+		edit: 
+		{
+			featureGroup: drawnItems,
+		}
+	};
+
+	var drawControl = new L.Control.Draw(drawPluginOptions);
+	map.addControl(drawControl);
+
+	//when the user draws a polygon, add it to the list and do the calculations
+	map.on("draw:created", function(e) 
+	{
+		var layer = e.layer;
+
+		drawnItems.addLayer(layer);
+		doCalculations(layer);
+	});
+
+	//when the user edits a polygon, update the calculations
+	map.on('draw:edited', function(e) 
+	{
+		var layers = e.layers;
+		layers.eachLayer(function (layer) {
+			doCalculations(layer);
+		});
+	});
+}
+
+//calculating nominal power
+function doCalculations(layer)
+{
+	var area = L.GeometryUtil.geodesicArea(layer.getLatLngs()[0]).toFixed(2);
+	var efficiency = 0.20; //assuming 20% yield
+	var peak_power = (area * efficiency).toFixed(2);
+
+	//I'm not sure if this is how you calculate nominal power, it seems a little to simple. I'll double check with Nicolas.
+	popupText = "";
+	popupText += "Area: " + area + "m<sup>2</sup><br />";
+	popupText += "Nominal Power: " + peak_power + "kWp<br />";
+
+	layer.bindPopup(popupText).openPopup();
 }
 
